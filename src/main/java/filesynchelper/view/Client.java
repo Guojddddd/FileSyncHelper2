@@ -82,6 +82,18 @@ public class Client extends JFrame {
 			});
 		}
 		{
+			operatePanel.add(getColorPanel(15, 13, 800, 10, FilePanel.COLOR_SAME));
+			operatePanel.add(getLabel("相同", 80, 13, 820, 10));
+			operatePanel.add(getColorPanel(15, 13, 800, 24, FilePanel.COLOR_OVER));
+			operatePanel.add(getLabel("多余", 80, 13, 820, 24));
+			operatePanel.add(getColorPanel(15, 13, 800, 38, FilePanel.COLOR_DIFF_SIZE));
+			operatePanel.add(getLabel("不同大小", 80, 13, 820, 38));
+			operatePanel.add(getColorPanel(15, 13, 800, 52, FilePanel.COLOR_DIFF_TYPE));
+			operatePanel.add(getLabel("不同类型", 80, 13, 820, 52));
+			operatePanel.add(getColorPanel(15, 13, 800, 66, FilePanel.COLOR_LOST));
+			operatePanel.add(getLabel("缺失", 80, 13, 820, 66));
+		}
+		{
 			JButton backButton = new JButton("BACK");
 			backButton.setSize(100, 30);
 			backButton.setLocation(10, 90);
@@ -126,6 +138,16 @@ public class Client extends JFrame {
 		label.setSize(w, h);
 		label.setLocation(x, y);
 		return label;
+	}
+
+	private JPanel getColorPanel(int w, int h, int x, int y, Color color) {
+		JPanel panel = new JPanel();
+		panel.setSize(w, h);
+		panel.setPreferredSize(new Dimension(w, h));
+		panel.setLocation(x, y);
+		panel.setBackground(color);
+		panel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+		return panel;
 	}
 
 	private void setPathBox() {

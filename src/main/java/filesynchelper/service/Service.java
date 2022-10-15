@@ -77,7 +77,7 @@ public class Service {
 		if (souTree == null && desTree == null) {
 			return null;
 		} else if (souTree != null && desTree == null) {
-			CompareTreeNode result = new CompareTreeNode(souTree.getName(), souTree.getType());
+			CompareTreeNode result = new CompareTreeNode(souTree.getName(), souTree.getType(), souTree.getSize(), 0);
 			if (souTree.getType() == FileType.FILE) {
 				result.getStatus().add(CompareStatus.STATUS_LOST);
 			} else {
@@ -90,7 +90,7 @@ public class Service {
 			Collections.sort(result.getChildren());
 			return result;
 		} else if (souTree == null && desTree != null) {
-			CompareTreeNode result = new CompareTreeNode(desTree.getName(), desTree.getType());
+			CompareTreeNode result = new CompareTreeNode(desTree.getName(), desTree.getType(), 0, desTree.getSize());
 			if (desTree.getType() == FileType.FILE) {
 				result.getStatus().add(CompareStatus.STATUS_OVER);
 			} else {
@@ -105,11 +105,11 @@ public class Service {
 		} else {
 			CompareTreeNode result;
 			if (souTree.getType() != desTree.getType()) {
-				result = new CompareTreeNode(souTree.getName(), FileType.FILE);
+				result = new CompareTreeNode(souTree.getName(), FileType.FILE, souTree.getSize(), desTree.getSize());
 				result.getStatus().add(CompareStatus.STATUS_DIFF_TYPE);
 				return result;
 			} else {
-				result = new CompareTreeNode(souTree.getName(), souTree.getType());
+				result = new CompareTreeNode(souTree.getName(), souTree.getType(), souTree.getSize(), desTree.getSize());
 				if (souTree.getType() == FileType.FILE) {
 					if (souTree.getSize() == desTree.getSize()) {
 						result.getStatus().add(CompareStatus.STATUS_SAME);

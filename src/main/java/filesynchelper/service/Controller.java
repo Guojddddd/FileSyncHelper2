@@ -75,7 +75,7 @@ public class Controller {
         List<FilePanel.ButtonData> result = new ArrayList<>();
         if (compareTreeNode != null) {
             for (CompareTreeNode childNode : compareTreeNode.getChildren()) {
-                FilePanel.ButtonData buttonData = new FilePanel.ButtonData(childNode.getName(), childNode.getType(), childNode.getStatus());
+                FilePanel.ButtonData buttonData = new FilePanel.ButtonData(childNode.getName(), childNode.getType(), childNode.getStatus(), childNode.getSouSize(), childNode.getDesSize());
                 result.add(buttonData);
             }
         }

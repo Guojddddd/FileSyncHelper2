@@ -13,12 +13,16 @@ public class CompareTreeNode implements Comparable<CompareTreeNode> {
 	private FileType type;
 	private EnumSet<CompareStatus> status;
 	private List<CompareTreeNode> children;
+	private long souSize;
+	private long desSize;
 
-	public CompareTreeNode(String name, FileType type) {
+	public CompareTreeNode(String name, FileType type, long souSize, long desSize) {
 		this.name = name;
 		this.type = type;
 		this.status = EnumSet.noneOf(CompareStatus.class);
 		this.children = new ArrayList<>();
+		this.souSize = souSize;
+		this.desSize = desSize;
 	}
 
 	public void addChild(CompareTreeNode child) {
