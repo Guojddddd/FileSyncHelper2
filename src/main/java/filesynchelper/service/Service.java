@@ -4,9 +4,12 @@ import filesynchelper.entity.CompareStatus;
 import filesynchelper.entity.CompareTreeNode;
 import filesynchelper.entity.FileTreeNode;
 import filesynchelper.entity.FileType;
+import javafx.util.Pair;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.util.*;
 
 /**
@@ -14,6 +17,8 @@ import java.util.*;
  */
 @Slf4j
 public class Service {
+	private static byte[] buffer = new byte[10 * 1024 * 1024];
+
 	public static FileTreeNode loadFileTree(File root) {
 		if (root == null || !root.exists()) {
 			return null;
@@ -133,6 +138,89 @@ public class Service {
 			}
 			Collections.sort(result.getChildren());
 			return result;
+		}
+	}
+
+	/**
+	 * 查找所有缺失的路径
+	 * @param souPath
+	 * @param desPath
+	 * @param compareTreeNode
+	 * @param result
+	 */
+	public static void getAllLostPath(StringBuilder souPath, StringBuilder desPath, CompareTreeNode compareTreeNode, List<Pair<String, String>> result) {
+		if (compareTreeNode.getStatus().size() == 1 && compareTreeNode.getStatus().contains(CompareStatus.STATUS_LOST)) {
+			result.add(new Pair<>(souPath.toString(), desPath.toString()));
+		}
+
+		if (compareTreeNode.getChildren() != null) {
+			for (CompareTreeNode childNode : compareTreeNode.getChildren()) {
+				if (childNode.getStatus().contains(CompareStatus.STATUS_LOST)) {
+					souPath.append("\\");
+					souPath.append(childNode.getName());
+					desPath.append("\\");
+					desPath.append(childNode.getName());
+
+					getAllLostPath(souPath, desPath, childNode, result);
+
+					souPath.delete(souPath.length() - childNode.getName().length() - 1, souPath.length());
+					desPath.delete(desPath.length() - childNode.getName().length() - 1, desPath.length());
+				}
+			}
+		}
+	}
+
+	/**
+	 * 复制一个文件
+	 * @param oneCopy
+	 * @throws Exception
+	 */
+	public static void copyFile(Pair<String, String> oneCopy) throws Exception {
+		FileInputStream fis = null;
+		FileOutputStream fos = null;
+		File inputFile = new File(oneCopy.getKey());
+		File outputFile = new File(oneCopy.getValue());
+
+//		log.info(oneCopy.getKey() + "," + oneCopy.getValue());
+
+		if (!inputFile.exists()) {
+			throw new Exception("输入文件不存在：" + oneCopy.getKey());
+		}
+
+		if (outputFile.exists()) {
+			log.warn("输出文件已存在：" + oneCopy.getValue());
+			return;
+		}
+		if (inputFile.isDirectory()) {
+			// 是目录，直接创建即可
+			outputFile.mkdirs();
+			return;
+		}
+
+		try {
+			fis = new FileInputStream(inputFile);
+			fos = new FileOutputStream(outputFile);
+
+			while (true) {
+				int readSize =  fis.read(buffer);
+				if (readSize == -1) {
+					break;
+				}
+
+				fos.write(buffer, 0, readSize);
+			}
+
+			fis.close();
+			fos.close();
+		} catch (Exception exc) {
+			log.error("复制文件报错", exc);
+
+			if (fis != null) {
+				fis.close();
+			}
+			if (fos != null) {
+				fos.close();
+			}
 		}
 	}
 }

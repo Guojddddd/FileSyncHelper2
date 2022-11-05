@@ -8,6 +8,7 @@ import java.awt.*;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.List;
+import java.util.function.Function;
 
 /**
  * @author guo
@@ -31,6 +32,7 @@ public class Client extends JFrame {
 	private JTextField desRootPathField = new JTextField();
 	private Controller controller = new Controller();
 	private FilePanel filePanel = new FilePanel();
+	private JLabel bottomShow = new JLabel("-");
 	private JLabel pathBox = new JLabel();
 	private Deque<Integer> scrollBarValues = new ArrayDeque<>();
 
@@ -56,29 +58,54 @@ public class Client extends JFrame {
 			setButton.setFocusPainted(false);
 			operatePanel.add(setButton);
 			setButton.addActionListener(e -> {
-				scrollBarValues.clear();
+				int option = JOptionPane.showConfirmDialog(this, "读取需要一定时间，确认设置？", "确认", JOptionPane.YES_NO_OPTION);
 
-				controller.set(souRootPathField.getText(), desRootPathField.getText());
-				List<FilePanel.ButtonData> buttonDataList = controller.getButtonData();
-				filePanel.setFileData(buttonDataList);
-				setPathBox();
+				if (option == JOptionPane.YES_OPTION) {
+					scrollBarValues.clear();
+
+					controller.set(souRootPathField.getText(), desRootPathField.getText());
+					List<FilePanel.ButtonData> buttonDataList = controller.getButtonData();
+					filePanel.setFileData(buttonDataList);
+					setPathBox();
+				}
 			});
 		}
 		{
 			JButton updateButton = new JButton("UPDATE");
-			updateButton.setSize(100, 70);
+			updateButton.setSize(100, 30);
 			updateButton.setLocation(690, 10);
 			updateButton.setFocusPainted(false);
 			operatePanel.add(updateButton);
 			updateButton.addActionListener(e -> {
-				int scrollValue = filePanel.getVerticalScrollBarValue();
+				update();
+			});
+		}
+		{
+			JButton syncButton = new JButton("SYNC");
+			syncButton.setSize(100, 30);
+			syncButton.setLocation(690, 50);
+			syncButton.setFocusPainted(false);
+			operatePanel.add(syncButton);
+			syncButton.addActionListener(e -> {
+				int option = JOptionPane.showConfirmDialog(this, "确认同步？", "确认", JOptionPane.YES_NO_OPTION);
 
-				controller.update();
-				List<FilePanel.ButtonData> buttonDataList = controller.getButtonData();
-				filePanel.setFileData(buttonDataList);
-				setPathBox();
+				if (option == JOptionPane.YES_OPTION) {
+					Function<String, Object> updateFunction = s -> {
+						JOptionPane.showMessageDialog(this, s, "同步结束", JOptionPane.INFORMATION_MESSAGE);
+						syncButton.setEnabled(true);
 
-				filePanel.setVerticalScrollBarValue(scrollValue);
+						update();
+
+						return null;
+					};
+					syncButton.setEnabled(false);
+					String syncResult = controller.syncCurrentDir(bottomShow, updateFunction);
+
+					if (syncResult != null) {
+						JOptionPane.showMessageDialog(this, syncResult);
+						syncButton.setEnabled(true);
+					}
+				}
 			});
 		}
 		{
@@ -123,6 +150,8 @@ public class Client extends JFrame {
 
 		this.add(filePanel, BorderLayout.CENTER);
 
+		this.add(bottomShow, BorderLayout.SOUTH);
+
 		filePanel.setFileButtonCallBack(name -> {
 			scrollBarValues.push(filePanel.getVerticalScrollBarValue());
 
@@ -158,5 +187,16 @@ public class Client extends JFrame {
 		}
 
 		pathBox.setText(originValue);
+	}
+
+	private void update() {
+		int scrollValue = filePanel.getVerticalScrollBarValue();
+
+		controller.update();
+		List<FilePanel.ButtonData> buttonDataList = controller.getButtonData();
+		filePanel.setFileData(buttonDataList);
+		setPathBox();
+
+		filePanel.setVerticalScrollBarValue(scrollValue);
 	}
 }
