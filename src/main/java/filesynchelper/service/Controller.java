@@ -2,8 +2,8 @@ package filesynchelper.service;
 
 import filesynchelper.entity.CompareTreeNode;
 import filesynchelper.entity.FileTreeNode;
+import filesynchelper.entity.Pair;
 import filesynchelper.view.FilePanel;
-import javafx.util.Pair;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.swing.*;

@@ -1,10 +1,6 @@
 package filesynchelper.service;
 
-import filesynchelper.entity.CompareStatus;
-import filesynchelper.entity.CompareTreeNode;
-import filesynchelper.entity.FileTreeNode;
-import filesynchelper.entity.FileType;
-import javafx.util.Pair;
+import filesynchelper.entity.*;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
