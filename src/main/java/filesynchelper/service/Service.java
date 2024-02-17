@@ -29,10 +29,16 @@ public class Service {
 			result = new FileTreeNode(FileType.DIR, root.getName());
 			File[] children = root.listFiles();
 
-			for (File child : children) {
-				FileTreeNode childNode = loadFileTree(child);
-				if (childNode != null) {
-					result.addChild(childNode);
+			if (children != null) {
+				for (File child : children) {
+					if (child.isHidden()) {
+						continue;
+					}
+
+					FileTreeNode childNode = loadFileTree(child);
+					if (childNode != null) {
+						result.addChild(childNode);
+					}
 				}
 			}
 		}
